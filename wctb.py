@@ -253,9 +253,9 @@ if "send" == CommandDataStruct.Name:
 	# Инициализация менеджера отправки сообщений.
 	SenderObject = Sender(Settings)
 	# Категория.
-	Category = CommandDataStruct.Arguments[0] if CommandDataStruct.Arguments[0] != "*" else None
+	Category = CommandDataStruct.Arguments[0] if CommandDataStruct.Arguments[0] != ":all" else None
 	# Теги.
-	Tags = CommandDataStruct.Arguments[1].split('+') if CommandDataStruct.Arguments[1] != "*" else None
+	Tags = CommandDataStruct.Arguments[1].split('+') if CommandDataStruct.Arguments[1] != ":all" else None
 	# Отправка сообщения.
 	SenderObject.send(Category, Tags, CommandDataStruct.Arguments[2])
 
