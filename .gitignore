@@ -1,0 +1,15 @@
+# Visual Studio project files.
+WallpapersCraftTelegramBot.pyproj
+WallpapersCraftTelegramBot.sln
+.vs
+
+# Parced data.
+Data
+Logs
+Temp
+
+# Collection of filtered slugs of titles.
+Collection.txt
+
+# Python cache.
+__pycache__
