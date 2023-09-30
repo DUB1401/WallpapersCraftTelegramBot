@@ -1,12 +1,12 @@
 # WallpapersCraft Telegram Bot
-**WallpapersCraft Telegram Bot** – это кроссплатформенный скрипт для получения данных с сайта [WallpapersCraft](https://wallpaperscraft.ru/) и их отправки в канал Telegram.
+**WallpapersCraft Telegram Bot** – это кроссплатформенный скрипт для получения данных с сайта [WallpapersCraft](https://wallpaperscraft.ru/) и их отправки в канал или группу Telegram.
 
 ## Порядок установки и использования
 1. Загрузить последний релиз. Распаковать.
 2. Установить Python версии не старше 3.10. Рекомендуется добавить в PATH.
 3. В среду исполнения установить следующие пакеты: [dublib](https://github.com/DUB1401/dublib), [BeautifulSoup4](https://launchpad.net/beautifulsoup), [requests](https://github.com/psf/requests).
 ```
-pip install git+https://github.com/DUB1401/dublib#egg=dublib
+pip install git+https://github.com/DUB1401/dublib
 pip install BeautifulSoup4
 pip install requests
 ```

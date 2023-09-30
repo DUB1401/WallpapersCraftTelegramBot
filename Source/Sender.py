@@ -377,13 +377,27 @@ class Sender:
 					# Запись в лог предупреждения: изображение проигнорировано.
 					logging.warning(f"Image ignored: {ImagesLinks[Index]}. Telegram exception: \"PHOTO_INVALID_DIMENSIONS\".")
 					
-		# Отправка сообщения.
-		self.__TelegramBot.send_media_group(
-			self.__Settings["target"], 
-			media = MediaGroup
-		)
-		
-		# Добавление алиаса обоев в историю.
-		self.__AddMessageToHistory(self.__GetSlugFromID(WallpaperData["id"]))
-		# Запись истории отправленных сообщений.
-		WriteJSON("Temp/History.json", self.__History)
+		try:
+			# Отправка сообщения.
+			self.__TelegramBot.send_media_group(
+				self.__Settings["target"], 
+				media = MediaGroup
+			)
+					
+		except telebot.apihelper.ApiTelegramException as ExceptionData:
+			# Описание исключения.
+			Description = str(ExceptionData)
+			# Запись в лог ошибки: исключение Telegram.
+			logging.error("Telegram exception: \"" + Description + "\".")
+			
+		except Exception as ExceptionData:
+			# Описание исключения.
+			Description = str(ExceptionData)
+			# Запись в лог ошибки: исключение.
+			logging.error("Exception: \"" + Description + "\".")
+			
+		else:
+			# Добавление алиаса обоев в историю.
+			self.__AddMessageToHistory(self.__GetSlugFromID(WallpaperData["id"]))
+			# Запись истории отправленных сообщений.
+			WriteJSON("Temp/History.json", self.__History)
