@@ -1,16 +1,15 @@
-#!/usr/bin/python
-
 from dublib.Methods import CheckPythonMinimalVersion, Cls, MakeRootDirectories, ReadJSON, Shutdown, WriteJSON
+from dublib.Terminalyzer import ArgumentsTypes, Command, Terminalyzer
 from Source.Functions import SecondsToTimeString
 from Source.ImageParser import ImageParser
 from Source.Collector import Collector
-from dublib.Terminalyzer import *
 from Source.Sender import Sender
 
 import datetime
 import logging
 import time
 import sys
+import os
 
 #==========================================================================================#
 # >>>>> ИНИЦИАЛИЗАЦИЯ СКРИПТА <<<<< #
@@ -63,31 +62,31 @@ CommandsList = list()
 
 # Создание команды: collect.
 COM_collect = Command("collect")
-COM_collect.addKeyPosition(["category", "tag"], ArgumentType.All, Important = True)
-COM_collect.addFlagPosition(["f"])
-COM_collect.addFlagPosition(["s"])
+COM_collect.add_key_position(["category", "tag"], ArgumentsTypes.All, important = True)
+COM_collect.add_flag_position(["f"])
+COM_collect.add_flag_position(["s"])
 CommandsList.append(COM_collect)
 
 # Создание команды: parse.
 COM_parse = Command("parse")
-COM_parse.addKeyPosition(["category", "tag", "image"], ArgumentType.All, Important = True, LayoutIndex = 1)
-COM_parse.addFlagPosition(["collection"], LayoutIndex = 1)
-COM_parse.addFlagPosition(["f"])
-COM_parse.addFlagPosition(["s"])
+COM_parse.add_key_position(["category", "tag", "image"], ArgumentsTypes.All, important = True, layout_index = 1)
+COM_parse.add_flag_position(["collection"], layout_index = 1)
+COM_parse.add_flag_position(["f"])
+COM_parse.add_flag_position(["s"])
 CommandsList.append(COM_parse)
 
 # Создание команды: send.
 COM_send = Command("send")
-COM_send.addArgument(ArgumentType.All)
-COM_send.addArgument(ArgumentType.All)
-COM_send.addArgument(ArgumentType.All)
-COM_send.addFlagPosition(["s"])
+COM_send.add_argument(ArgumentsTypes.All)
+COM_send.add_argument(ArgumentsTypes.All)
+COM_send.add_argument(ArgumentsTypes.All)
+COM_send.add_flag_position(["s"])
 CommandsList.append(COM_send)
 
 # Инициализация обработчика консольных аргументов.
 CAC = Terminalyzer()
 # Получение информации о проверке команд.
-CommandDataStruct = CAC.checkCommands(CommandsList)
+CommandDataStruct = CAC.check_commands(CommandsList)
 
 # Если не удалось определить команду.
 if CommandDataStruct == None:
@@ -110,7 +109,7 @@ IsForceModeActivated = False
 InFuncMessage_ForceMode = ""
 
 # Обработка флага: режим перезаписи.
-if "f" in CommandDataStruct.Flags and CommandDataStruct.Name not in ["send"]:
+if "f" in CommandDataStruct.flags and CommandDataStruct.name not in ["send"]:
 	# Включение режима перезаписи.
 	IsForceModeActivated = True
 	# Запись в лог сообщения: включён режим перезаписи.
@@ -125,7 +124,7 @@ else:
 	InFuncMessage_ForceMode = "Force mode: OFF\n"
 
 # Обработка флага: выключение ПК после завершения работы скрипта.
-if "s" in CommandDataStruct.Flags:
+if "s" in CommandDataStruct.flags:
 	# Включение режима.
 	IsShutdowAfterEnd = True
 	# Запись в лог сообщения о том, что ПК будет выключен после завершения работы.
@@ -138,7 +137,7 @@ if "s" in CommandDataStruct.Flags:
 #==========================================================================================#
 
 # Обработка команды: collect.
-if "collect" == CommandDataStruct.Name:
+if "collect" == CommandDataStruct.name:
 	# Запись в лог сообщения: заголовок парсинга.
 	logging.info("====== Collecting ======")
 	# Инициализация парсера.
@@ -151,14 +150,14 @@ if "collect" == CommandDataStruct.Name:
 	ExternalMessage = InFuncMessage_Shutdown + InFuncMessage_ForceMode
 	
 	# Если указано парсить категорию.
-	if "category" in CommandDataStruct.Keys:
+	if "category" in CommandDataStruct.keys:
 		# Сбор списка алиасов обоев в категории.
-		Slugs = CollectorObject.collect("catalog", CommandDataStruct.Values["category"], Message = ExternalMessage)
+		Slugs = CollectorObject.collect("catalog", CommandDataStruct.values["category"], Message = ExternalMessage)
 		
 	# Если указано парсить тег.
-	if "tag" in CommandDataStruct.Keys:
+	if "tag" in CommandDataStruct.keys:
 		# Сбор списка алиасов обоев в категории.
-		Slugs = CollectorObject.collect("tag", CommandDataStruct.Values["tag"], Message = ExternalMessage)
+		Slugs = CollectorObject.collect("tag", CommandDataStruct.values["tag"], Message = ExternalMessage)
 		
 	# Если отключён режим перезаписи.
 	if IsForceModeActivated == False:
@@ -187,7 +186,7 @@ if "collect" == CommandDataStruct.Name:
 			FileWriter.write(Slug + "\n")
 
 # Обработка команды: parse.
-if "parse" == CommandDataStruct.Name:
+if "parse" == CommandDataStruct.name:
 	# Запись в лог сообщения: заголовок парсинга.
 	logging.info("====== Parcing ======")
 	# Инициализация парсера.
@@ -200,12 +199,12 @@ if "parse" == CommandDataStruct.Name:
 	ExternalMessage = InFuncMessage_Shutdown + InFuncMessage_ForceMode
 	
 	# Если указано парсить категорию.
-	if "category" in CommandDataStruct.Keys:
+	if "category" in CommandDataStruct.keys:
 		# Сбор списка алиасов обоев в категории.
-		Slugs = CollectorObject.collect("catalog", CommandDataStruct.Values["category"], Message = ExternalMessage)
+		Slugs = CollectorObject.collect("catalog", CommandDataStruct.values["category"], Message = ExternalMessage)
 		
 	# Если указано парсить коллекцию.
-	if "collection" in CommandDataStruct.Flags:
+	if "collection" in CommandDataStruct.flags:
 		
 		# Если существует файл коллекции.
 		if os.path.exists("Collection.txt"):
@@ -226,14 +225,14 @@ if "parse" == CommandDataStruct.Name:
 		logging.info("Titles count in collection: " + str(len(Slugs)) + ".")
 	
 	# Если указано парсить изображение.
-	if "image" in CommandDataStruct.Keys:
+	if "image" in CommandDataStruct.keys:
 		# Записать указанный ключём алиас.
-		Slugs.append(CommandDataStruct.Values["image"])
+		Slugs.append(CommandDataStruct.values["image"])
 		
 	# Если указано парсить тег.
-	if "tag" in CommandDataStruct.Keys:
+	if "tag" in CommandDataStruct.keys:
 		# Сбор списка алиасов обоев в категории.
-		Slugs = CollectorObject.collect("tag", CommandDataStruct.Values["tag"], Message = ExternalMessage)
+		Slugs = CollectorObject.collect("tag", CommandDataStruct.values["tag"], Message = ExternalMessage)
 		
 	# Для каждого алиаса.
 	for Index in range(0, len(Slugs)):
@@ -247,17 +246,17 @@ if "parse" == CommandDataStruct.Name:
 			WriteJSON("Data/" + Slugs[Index] + ".json", ImageData)
 
 # Обработка команды: send.
-if "send" == CommandDataStruct.Name:
+if "send" == CommandDataStruct.name:
 	# Запись в лог сообщения: заголовок парсинга.
 	logging.info("====== Sending message ======")
 	# Инициализация менеджера отправки сообщений.
 	SenderObject = Sender(Settings)
 	# Категория.
-	Category = CommandDataStruct.Arguments[0] if CommandDataStruct.Arguments[0] != ":all" else None
+	Category = CommandDataStruct.arguments[0] if CommandDataStruct.arguments[0] != ":all" else None
 	# Теги.
-	Tags = CommandDataStruct.Arguments[1].split('+') if CommandDataStruct.Arguments[1] != ":all" else None
+	Tags = CommandDataStruct.arguments[1].split('+') if CommandDataStruct.arguments[1] != ":all" else None
 	# Отправка сообщения.
-	SenderObject.send(Category, Tags, CommandDataStruct.Arguments[2])
+	SenderObject.send(Category, Tags, CommandDataStruct.arguments[2])
 
 #==========================================================================================#
 # >>>>> ЗАВЕРШЕНИЕ РАБОТЫ СКРИПТА <<<<< #

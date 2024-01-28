@@ -1,5 +1,6 @@
 from Source.RequestsManager import RequestsManager
-from dublib.Methods import Cls, RemoveHTML
+from dublib.Polyglot import HTML
+from dublib.Methods import Cls
 from bs4 import BeautifulSoup
 
 import logging
@@ -45,14 +46,14 @@ class ImageParser:
 			
 			# Если строка описывает автора.
 			if "Автор" in str(Block):
-				Author = RemoveHTML(Block).replace("Автор:", "").strip()
+				Author = HTML(Block).plain_text.replace("Автор:", "").strip()
 		
 		return Author
 	
 	# Возвращает категорию обоев.
 	def __GetCategory(self, Soup: BeautifulSoup) -> str:
 		# Категория обоев.
-		Category = RemoveHTML(Soup.find("li", {"class": "filter filter_selected"}).get_text().strip())
+		Category = HTML(Soup.find("li", {"class": "filter filter_selected"}).get_text().strip()).plain_text
 		# Удаление количества обоев в категории.
 		Category = str().join([Character for Character in Category if not Character.isdigit()])
 		
@@ -78,7 +79,7 @@ class ImageParser:
 			
 			# Если строка описывает автора.
 			if "Лицензия" in str(Block):
-				License = RemoveHTML(Block).replace("Лицензия:", "").strip()
+				License = HTML(Block).plain_text.replace("Лицензия:", "").strip()
 				
 		# Если лицензии нет, обнулить её.
 		if License == "Без лицензии":
@@ -89,7 +90,7 @@ class ImageParser:
 	# Возвращает ссылку на оригинальные обои.
 	def __GetOriginal(self, Slug: str, Soup: BeautifulSoup) -> str:
 		# Оригинальное разрешение.
-		OriginalResolution = RemoveHTML(Soup.find_all("div", {"class": "wallpaper-table__row"})[0]).replace("Оригинальное разрешение", "").strip()
+		OriginalResolution = HTML(Soup.find_all("div", {"class": "wallpaper-table__row"})[0]).plain_text.replace("Оригинальное разрешение", "").strip()
 		# Ссылка на оригинальные обои.
 		OriginalLink = f"https://images.wallpaperscraft.ru/image/single/{Slug}_{OriginalResolution}.jpg" 
 
@@ -100,7 +101,7 @@ class ImageParser:
 		# Рейтинг обоев.
 		Rating = None
 		# Получение строки с рейтингом.
-		RatingString = RemoveHTML(Soup.find("span", {"class": "wallpaper-votes__rate JS-Vote-Rating"}))
+		RatingString = HTML(Soup.find("span", {"class": "wallpaper-votes__rate JS-Vote-Rating"})).plain_text
 		
 		# Если рейтинг есть, то конвертировать и записать его.
 		if RatingString != "":
